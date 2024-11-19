@@ -10,11 +10,18 @@ import java.awt.Dimension;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.DataInputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.PrintStream;
+import java.io.Reader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Random;
 
@@ -45,6 +52,15 @@ public class BadIOGUI {
         canvas.add(write, BorderLayout.CENTER);
         frame.setContentPane(canvas);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+        final JPanel newPanel = new JPanel();
+        newPanel.setLayout(new BoxLayout(newPanel, BoxLayout.X_AXIS));
+        canvas.remove(write);
+        canvas.add(newPanel, BorderLayout.CENTER);
+        newPanel.add(write);
+
+        final JButton Read = new JButton("Press me pls!");
+        newPanel.add(Read);
         /*
          * Handlers
          */
@@ -60,10 +76,18 @@ public class BadIOGUI {
                  */
                 try (PrintStream ps = new PrintStream(PATH, StandardCharsets.UTF_8)) {
                     ps.print(randomGenerator.nextInt());
+                    System.out.println(Files.readAllLines(Path.of(PATH), StandardCharsets.UTF_8));
                 } catch (IOException e1) {
                     JOptionPane.showMessageDialog(frame, e1, "Error", JOptionPane.ERROR_MESSAGE);
                     e1.printStackTrace(); // NOPMD: allowed as this is just an exercise
                 }
+
+            }
+        });
+
+        Read.addActionListener(new ActionListener() {
+            public void actionPerformed(final ActionEvent e) {
+                System.out.println("You pressed me!! :) ");
             }
         });
     }
@@ -81,6 +105,7 @@ public class BadIOGUI {
         final int sw = (int) screen.getWidth();
         final int sh = (int) screen.getHeight();
         frame.setSize(sw / PROPORTION, sh / PROPORTION);
+        frame.pack();
         /*
          * Instead of appearing at (0,0), upper left corner of the screen, this
          * flag makes the OS window manager take care of the default positioning
